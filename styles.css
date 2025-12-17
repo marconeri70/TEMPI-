@@ -138,12 +138,12 @@ body{
 
 .tableWrap{
   padding:0 16px 16px;
-  overflow-x:auto;                 /* ✅ scroll orizzontale su telefono */
+  overflow-x:auto;                 /* scroll orizzontale su telefono */
   -webkit-overflow-scrolling:touch;
 }
 .table{
   width:100%;
-  min-width:760px;                 /* ✅ evita che la descrizione si “schiacci” troppo */
+  min-width:760px;                 /* evita che la descrizione si “schiacci” troppo */
   border-collapse:separate;
   border-spacing:0;
   border:1px solid var(--line);
@@ -267,7 +267,6 @@ body{
 }
 .muted{color:var(--muted)}
 .small{font-size:12px}
-.hidden{display:none}
 
 /* ===== MODALE ===== */
 .modal{
@@ -315,3 +314,6 @@ body{
   gap:10px;
   border-top:1px solid var(--line);
 }
+
+/* ✅ FIX DEFINITIVO: hidden deve vincere su tutto (anche sulla modale) */
+.hidden{display:none !important;}
