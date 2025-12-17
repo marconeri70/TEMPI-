@@ -1,7 +1,3 @@
-/* Tempi FLEX — app offline (PWA) con medie e riepilogo
-   Dati iniziali presi dal tuo file TEMPI FLEX.xlsx
-*/
-
 const STORAGE_KEY = "tempi_flex_v1";
 
 const SAMPLE = {
@@ -33,6 +29,9 @@ const SAMPLE = {
 let state = loadState();
 let currentView = "ZONA1";
 
+// modale
+let editingIndex = null;
+
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
@@ -60,7 +59,16 @@ const els = {
   globalAvg: $("#globalAvg"),
   bars: $("#bars"),
 
-  saveState: $("#saveState")
+  saveState: $("#saveState"),
+
+  // modal
+  editModal: $("#editModal"),
+  modalClose: $("#modalClose"),
+  modalCancel: $("#modalCancel"),
+  modalSave: $("#modalSave"),
+  modalTime: $("#modalTime"),
+  modalDesc: $("#modalDesc"),
+  modalZone: $("#modalZone")
 };
 
 function loadState(){
@@ -68,7 +76,6 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return structuredClone(SAMPLE);
     const parsed = JSON.parse(raw);
-    // fallback: se mancano zone
     return {
       ZONA1: Array.isArray(parsed.ZONA1) ? parsed.ZONA1 : structuredClone(SAMPLE.ZONA1),
       ZONA2: Array.isArray(parsed.ZONA2) ? parsed.ZONA2 : structuredClone(SAMPLE.ZONA2),
@@ -98,10 +105,17 @@ function avgOfRows(rows){
 
 function fmt(x){
   if(x === null || x === undefined) return "—";
-  // 4 decimali max, ma tolgo gli zeri finali
   let s = (Math.round(x * 10000) / 10000).toFixed(4);
   s = s.replace(/\.?0+$/,"");
   return s.replace(".", ",");
+}
+
+function escapeAttr(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("\"","&quot;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
 }
 
 function setActiveTab(view){
@@ -138,11 +152,12 @@ function renderZone(zoneKey){
     tdTime.innerHTML = `<input class="inp" inputmode="decimal" type="number" step="0.001" value="${escapeAttr(row.time)}" data-k="time" data-i="${idx}">`;
 
     const tdDesc = document.createElement("td");
-    tdDesc.innerHTML = `<input class="inp" type="text" value="${escapeAttr(row.desc)}" data-k="desc" data-i="${idx}">`;
+    tdDesc.innerHTML = `<input class="inp" type="text" value="${escapeAttr(row.desc)}" data-k="desc" data-i="${idx}" title="${escapeAttr(row.desc)}">`;
 
     const tdAct = document.createElement("td");
     tdAct.innerHTML = `
       <div class="rowActions">
+        <button class="iconBtn" title="Apri popup (descrizione completa)" data-edit="${idx}">✎</button>
         <button class="iconBtn iconBtn--danger" title="Elimina" data-del="${idx}">✖</button>
       </div>
     `;
@@ -152,14 +167,6 @@ function renderZone(zoneKey){
     tr.appendChild(tdAct);
     els.zoneTbody.appendChild(tr);
   });
-}
-
-function escapeAttr(v){
-  return String(v ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("\"","&quot;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
 }
 
 function renderSummary(){
@@ -175,7 +182,6 @@ function renderSummary(){
   const global = avgs.length ? (avgs.reduce((p,c)=>p+c,0) / avgs.length) : null;
   els.globalAvg.textContent = fmt(global);
 
-  // barre
   const items = [
     { label:"Z1", value:a1 },
     { label:"Z2", value:a2 },
@@ -196,6 +202,46 @@ function renderSummary(){
     els.bars.appendChild(row);
   });
 }
+
+/* ===== MODALE ===== */
+function openModal(idx){
+  editingIndex = idx;
+  const row = state[currentView][idx];
+  if(!row) return;
+
+  els.modalZone.textContent = `${currentView.replace("ZONA","ZONA ")} — Riga ${idx + 1}`;
+  els.modalTime.value = (row.time ?? "");
+  els.modalDesc.value = (row.desc ?? "");
+
+  els.editModal.classList.remove("hidden");
+  els.modalDesc.focus();
+}
+
+function closeModal(){
+  els.editModal.classList.add("hidden");
+  editingIndex = null;
+}
+
+els.modalClose.addEventListener("click", closeModal);
+els.modalCancel.addEventListener("click", closeModal);
+els.editModal.addEventListener("click", (e) => {
+  const target = e.target;
+  if(target && target.hasAttribute && target.hasAttribute("data-modal-close")) closeModal();
+});
+
+els.modalSave.addEventListener("click", () => {
+  if(editingIndex === null) return;
+  const row = state[currentView][editingIndex];
+  if(!row) return;
+
+  const t = els.modalTime.value === "" ? "" : Number(els.modalTime.value);
+  row.time = (t === "" || Number.isFinite(t)) ? t : row.time;
+  row.desc = els.modalDesc.value;
+
+  saveState();
+  renderZone(currentView);
+  closeModal();
+});
 
 /* EVENTI */
 els.tabs.forEach(t => t.addEventListener("click", () => setActiveTab(t.dataset.view)));
@@ -223,24 +269,31 @@ els.zoneTbody.addEventListener("input", (e) => {
     row.desc = inp.value;
   }
   saveState();
-  // aggiorno solo i numeri in alto (media/righe)
+
   const a = avgOfRows(state[currentView]);
   els.zoneAvg.textContent = fmt(a);
   els.zoneCount.textContent = String(state[currentView].length);
 });
 
 els.zoneTbody.addEventListener("click", (e) => {
-  const btn = e.target;
-  if(!(btn instanceof HTMLElement)) return;
-  const del = btn.getAttribute("data-del");
-  if(del === null) return;
+  const el = e.target;
+  if(!(el instanceof HTMLElement)) return;
 
-  const idx = Number(del);
-  if(!Number.isInteger(idx)) return;
+  const edit = el.getAttribute("data-edit");
+  if(edit !== null){
+    const idx = Number(edit);
+    if(Number.isInteger(idx)) openModal(idx);
+    return;
+  }
 
-  state[currentView].splice(idx, 1);
-  saveState();
-  renderZone(currentView);
+  const del = el.getAttribute("data-del");
+  if(del !== null){
+    const idx = Number(del);
+    if(!Number.isInteger(idx)) return;
+    state[currentView].splice(idx, 1);
+    saveState();
+    renderZone(currentView);
+  }
 });
 
 els.btnReset.addEventListener("click", () => {
@@ -288,7 +341,6 @@ els.importCsv.addEventListener("change", async () => {
   try{
     const txt = await f.text();
     const rows = parseCsv(txt);
-    // accetto: tempo, descrizione
     const mapped = rows
       .map(r => ({ time: Number(String(r[0] ?? "").replace(",", ".")), desc: String(r[1] ?? "").trim() }))
       .filter(r => Number.isFinite(r.time) || r.desc.length > 0);
@@ -328,14 +380,12 @@ els.btnExportCsv.addEventListener("click", () => {
 });
 
 function parseCsv(text){
-  // parser semplice: separatore ; o ,
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if(lines.length === 0) return [];
   const sep = lines[0].includes(";") ? ";" : ",";
   const out = [];
   for(let i=0;i<lines.length;i++){
     const parts = lines[i].split(sep).map(s => s.trim().replace(/^"|"$/g,""));
-    // salta header se sembra header
     if(i===0 && /tempo/i.test(parts[0] || "")) continue;
     out.push(parts);
   }
@@ -347,6 +397,5 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 
-// prima render
 render();
 saveState();
