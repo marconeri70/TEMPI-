@@ -3,16 +3,140 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>La mia app</title>
+  <title>Tempi FLEX — Medie & Riepilogo</title>
 
   <link rel="manifest" href="./app.webmanifest">
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <h1>La mia app</h1>
-  <p id="msg">Ciao! Funziona 🎉</p>
-  <button id="btn">Cliccami</button>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__logo">⏱️</div>
+        <div class="brand__text">
+          <div class="brand__title">Tempi FLEX</div>
+          <div class="brand__subtitle">ZONA1 • ZONA2 • ZONA3 • Riepilogo</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnReset" title="Ripristina i dati di esempio">Ripristina</button>
+        <button class="btn btn--primary" id="btnExport" title="Esporta i dati (JSON)">Esporta</button>
+        <label class="btn btn--ghost" title="Importa un file JSON esportato dall'app">
+          Importa
+          <input type="file" id="importJson" accept="application/json" hidden>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs" aria-label="Sezioni">
+      <button class="tab tab--active" data-view="ZONA1">ZONA 1</button>
+      <button class="tab" data-view="ZONA2">ZONA 2</button>
+      <button class="tab" data-view="ZONA3">ZONA 3</button>
+      <button class="tab" data-view="RIEPILOGO">RIEPILOGO</button>
+    </nav>
+
+    <section class="card" id="viewZone">
+      <div class="card__head">
+        <div>
+          <h2 class="card__title" id="zoneTitle">ZONA 1</h2>
+          <p class="card__hint">Inserisci/aggiorna i tempi: la media si aggiorna da sola e viene salvata in automatico.</p>
+        </div>
+
+        <div class="card__headRight">
+          <div class="stat">
+            <div class="stat__label">Media zona</div>
+            <div class="stat__value" id="zoneAvg">—</div>
+          </div>
+          <div class="stat">
+            <div class="stat__label">Righe</div>
+            <div class="stat__value" id="zoneCount">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn--primary" id="btnAddRow">+ Aggiungi riga</button>
+
+        <div class="spacer"></div>
+
+        <label class="btn btn--ghost" title="Importa CSV (colonna A=tempo, colonna B=descrizione)">
+          Importa CSV zona
+          <input type="file" id="importCsv" accept=".csv,text/csv" hidden>
+        </label>
+
+        <button class="btn" id="btnExportCsv" title="Esporta la zona in CSV">Esporta CSV zona</button>
+      </div>
+
+      <div class="tableWrap">
+        <table class="table" id="zoneTable">
+          <thead>
+            <tr>
+              <th class="colTime">Tempo</th>
+              <th>Descrizione</th>
+              <th class="colAct">Azioni</th>
+            </tr>
+          </thead>
+          <tbody id="zoneTbody"></tbody>
+        </table>
+      </div>
+
+      <div class="card__foot">
+        <div class="muted">
+          Suggerimento: se vuoi confrontare solo i “Robot ~23–28s”, separa le righe “OP…” (1–2s) in un’altra tabella o usa un filtro (posso aggiungerlo).
+        </div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="viewSummary">
+      <div class="card__head">
+        <div>
+          <h2 class="card__title">Riepilogo</h2>
+          <p class="card__hint">Medie per zona + media generale.</p>
+        </div>
+
+        <div class="card__headRight">
+          <div class="stat stat--big">
+            <div class="stat__label">Media generale</div>
+            <div class="stat__value" id="globalAvg">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summaryGrid">
+        <div class="miniCard">
+          <div class="miniCard__title">ZONA 1</div>
+          <div class="miniCard__value" id="avgZ1">—</div>
+        </div>
+        <div class="miniCard">
+          <div class="miniCard__title">ZONA 2</div>
+          <div class="miniCard__value" id="avgZ2">—</div>
+        </div>
+        <div class="miniCard">
+          <div class="miniCard__title">ZONA 3</div>
+          <div class="miniCard__value" id="avgZ3">—</div>
+        </div>
+      </div>
+
+      <div class="chartCard">
+        <div class="chartCard__title">Grafico medie per zona</div>
+        <div class="bars" id="bars"></div>
+        <div class="muted small">Barre proporzionali al valore massimo tra le zone.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="muted small">Tempi FLEX — salva in automatico sul browser (localStorage). PWA pronta per GitHub Pages.</span>
+      <span class="muted small" id="saveState">—</span>
+    </div>
+  </footer>
 
   <script src="./app.js"></script>
 </body>
 </html>
+
