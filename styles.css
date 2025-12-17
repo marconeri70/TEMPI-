@@ -1,3 +1,4 @@
+/* ===== Tema scuro (default) ===== */
 :root{
   --bg:#0b1220;
   --card:#0f1b33;
@@ -8,6 +9,29 @@
   --primary:#60a5fa;
   --danger:#fb7185;
   --good:#34d399;
+
+  --shadow: rgba(0,0,0,.35);
+  --shadow2: rgba(0,0,0,.55);
+  --grad1: rgba(96,165,250,.15);
+  --grad2: rgba(52,211,153,.10);
+}
+
+/* ===== Tema chiaro ===== */
+[data-theme="light"]{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --card2:#f3f6ff;
+  --text:#0b1220;
+  --muted:#4b5563;
+  --line:rgba(0,0,0,.10);
+  --primary:#2563eb;
+  --danger:#e11d48;
+  --good:#059669;
+
+  --shadow: rgba(0,0,0,.10);
+  --shadow2: rgba(0,0,0,.18);
+  --grad1: rgba(37,99,235,.08);
+  --grad2: rgba(5,150,105,.06);
 }
 
 *{box-sizing:border-box}
@@ -15,8 +39,8 @@ html,body{height:100%}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: radial-gradient(1000px 600px at 30% 10%, rgba(96,165,250,.15), transparent 50%),
-              radial-gradient(900px 500px at 80% 20%, rgba(52,211,153,.10), transparent 55%),
+  background: radial-gradient(1000px 600px at 30% 10%, var(--grad1), transparent 50%),
+              radial-gradient(900px 500px at 80% 20%, var(--grad2), transparent 55%),
               var(--bg);
   color:var(--text);
 }
@@ -24,7 +48,7 @@ body{
 .topbar{
   position:sticky; top:0; z-index:10;
   backdrop-filter: blur(10px);
-  background: rgba(11,18,32,.78);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
   border-bottom:1px solid var(--line);
 }
 .topbar__inner{
@@ -41,8 +65,8 @@ body{
   width:44px; height:44px;
   display:grid; place-items:center;
   border-radius:14px;
-  background: rgba(96,165,250,.18);
-  border:1px solid rgba(96,165,250,.25);
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  border:1px solid color-mix(in srgb, var(--primary) 28%, transparent);
 }
 .brand__title{font-weight:800; letter-spacing:.2px}
 .brand__subtitle{color:var(--muted); font-size:12px}
@@ -63,7 +87,7 @@ body{
 }
 .tab{
   border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
   color:var(--text);
   padding:10px 12px;
   border-radius:14px;
@@ -71,15 +95,15 @@ body{
   font-weight:650;
 }
 .tab--active{
-  background: rgba(96,165,250,.20);
-  border-color: rgba(96,165,250,.35);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 .card{
   border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(15,27,51,.95), rgba(12,22,43,.92));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 95%, transparent), color-mix(in srgb, var(--card2) 92%, transparent));
   border-radius:22px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  box-shadow: 0 20px 60px var(--shadow);
   overflow:hidden;
 }
 .card__head{
@@ -102,7 +126,7 @@ body{
   min-width:120px;
   padding:10px 12px;
   border-radius:18px;
-  background: rgba(255,255,255,.04);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
   border:1px solid var(--line);
 }
 .stat__label{color:var(--muted); font-size:12px}
@@ -120,30 +144,28 @@ body{
 
 .btn{
   border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
   color:var(--text);
   padding:10px 12px;
   border-radius:14px;
   cursor:pointer;
   font-weight:700;
 }
-.btn:hover{background: rgba(255,255,255,.07)}
+.btn:hover{background: color-mix(in srgb, var(--text) 7%, transparent)}
 .btn--primary{
-  background: rgba(96,165,250,.20);
-  border-color: rgba(96,165,250,.35);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
 }
-.btn--ghost{
-  background: transparent;
-}
+.btn--ghost{background: transparent;}
 
 .tableWrap{
   padding:0 16px 16px;
-  overflow-x:auto;                 /* scroll orizzontale su telefono */
+  overflow-x:auto;
   -webkit-overflow-scrolling:touch;
 }
 .table{
   width:100%;
-  min-width:760px;                 /* evita che la descrizione si “schiacci” troppo */
+  min-width:760px;
   border-collapse:separate;
   border-spacing:0;
   border:1px solid var(--line);
@@ -155,12 +177,12 @@ body{
   font-size:12px;
   color:var(--muted);
   padding:10px 12px;
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   border-bottom:1px solid var(--line);
 }
 .table tbody td{
   padding:10px 12px;
-  border-bottom:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid color-mix(in srgb, var(--text) 10%, transparent);
   vertical-align:top;
 }
 .table tbody tr:last-child td{border-bottom:none}
@@ -171,32 +193,29 @@ body{
 .inp{
   width:100%;
   border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   color:var(--text);
   padding:10px 10px;
   border-radius:14px;
   outline:none;
 }
 .inp:focus{
-  border-color: rgba(96,165,250,.45);
-  box-shadow: 0 0 0 3px rgba(96,165,250,.12);
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
 }
-.inp--area{
-  resize: vertical;
-  min-height: 120px;
-}
+.inp--area{resize: vertical; min-height: 120px;}
 
 .rowActions{display:flex; gap:8px; justify-content:flex-end}
 .iconBtn{
   border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   color:var(--text);
   padding:8px 10px;
   border-radius:12px;
   cursor:pointer;
   font-weight:800;
 }
-.iconBtn--danger{border-color: rgba(251,113,133,.35)}
+.iconBtn--danger{border-color: color-mix(in srgb, var(--danger) 45%, transparent);}
 
 .summaryGrid{
   display:grid;
@@ -211,7 +230,7 @@ body{
 
 .miniCard{
   border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   border-radius:18px;
   padding:14px;
 }
@@ -221,7 +240,7 @@ body{
 .chartCard{
   margin:0 16px 16px;
   border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   border-radius:18px;
   padding:14px;
 }
@@ -238,14 +257,14 @@ body{
 .barTrack{
   height:14px;
   border-radius:999px;
-  background: rgba(255,255,255,.06);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
   border:1px solid var(--line);
   overflow:hidden;
 }
 .barFill{
   height:100%;
   width:0%;
-  background: linear-gradient(90deg, rgba(96,165,250,.85), rgba(52,211,153,.75));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 85%, transparent), color-mix(in srgb, var(--good) 75%, transparent));
   border-radius:999px;
 }
 .barVal{text-align:right; font-weight:900}
@@ -253,7 +272,7 @@ body{
 .footer{
   position:fixed; left:0; right:0; bottom:0;
   border-top:1px solid var(--line);
-  background: rgba(11,18,32,.80);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
   backdrop-filter: blur(10px);
 }
 .footer__inner{
@@ -281,13 +300,16 @@ body{
   inset:0;
   background: rgba(0,0,0,.55);
 }
+[data-theme="light"] .modal__backdrop{
+  background: rgba(0,0,0,.35);
+}
 .modal__panel{
   position:relative;
   width:min(720px, 92vw);
   border-radius:22px;
   border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(15,27,51,.98), rgba(12,22,43,.96));
-  box-shadow: 0 30px 80px rgba(0,0,0,.55);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 98%, transparent), color-mix(in srgb, var(--card2) 96%, transparent));
+  box-shadow: 0 30px 80px var(--shadow2);
   overflow:hidden;
 }
 .modal__head{
@@ -315,5 +337,5 @@ body{
   border-top:1px solid var(--line);
 }
 
-/* ✅ FIX DEFINITIVO: hidden deve vincere su tutto (anche sulla modale) */
+/* ✅ FIX definitivo */
 .hidden{display:none !important;}
