@@ -1,4 +1,5 @@
 const STORAGE_KEY = "tempi_flex_v1";
+const THEME_KEY = "tempi_flex_theme";
 
 const SAMPLE = {
   ZONA1: [
@@ -61,6 +62,9 @@ const els = {
 
   saveState: $("#saveState"),
 
+  // tema
+  btnTheme: $("#btnTheme"),
+
   // modal
   editModal: $("#editModal"),
   modalClose: $("#modalClose"),
@@ -71,6 +75,38 @@ const els = {
   modalZone: $("#modalZone")
 };
 
+/* ===== Tema ===== */
+function getTheme(){
+  const t = localStorage.getItem(THEME_KEY);
+  return (t === "light" || t === "dark") ? t : "dark";
+}
+function applyTheme(theme){
+  const root = document.documentElement;
+  if(theme === "light"){
+    root.setAttribute("data-theme", "light");
+    els.btnTheme.textContent = "🌙 Scuro";
+    els.btnTheme.title = "Passa al tema scuro";
+    // theme-color per mobile
+    setMetaThemeColor("#f6f7fb");
+  }else{
+    root.removeAttribute("data-theme");
+    els.btnTheme.textContent = "☀️ Chiaro";
+    els.btnTheme.title = "Passa al tema chiaro";
+    setMetaThemeColor("#111827");
+  }
+  localStorage.setItem(THEME_KEY, theme);
+}
+function setMetaThemeColor(color){
+  const el = document.querySelector('meta[name="theme-color"]');
+  if(el) el.setAttribute("content", color);
+}
+
+els.btnTheme.addEventListener("click", () => {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  applyTheme(next);
+});
+
+/* ===== Stato ===== */
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -397,5 +433,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 
+/* Avvio */
+applyTheme(getTheme());
 render();
 saveState();
